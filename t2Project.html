@@ -9,7 +9,34 @@ canvas {
 </style>
 
 <body>
-<canvas id="canvasID" width=400 height=400></canvas>
+<canvas id="canvasID" width=1200 height=500></canvas>
 <script>
-
+	var canvas = document.getElementById("canvasID");
+	var context = canvas.getContext("2d");
+	var stateController = 0;
+	
+	document.addEventListener("keydown",affirmKeyDown);
+	
+	setInterval(controlState,33);
+	
+	function controlState(){
+		if(stateController == 0){
+			startScreen();
+		}
+		else if(stateController == 1){
+			characterSelect();
+		}
+		else if(stateController == 2){
+			playGame();
+		}
+	}
+	
+	function checkKeyDown(event){
+		stateController++;
+		document.removeEventListener("keydown",affirmKeyDown);
+	}
+	
+	function startScreen(){
+		context.drawImage(loadPhoto,
+	}
 </script>

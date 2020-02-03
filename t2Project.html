@@ -14,29 +14,107 @@ canvas {
 	var canvas = document.getElementById("canvasID");
 	var context = canvas.getContext("2d");
 	var stateController = 0;
-	
-	document.addEventListener("keydown",affirmKeyDown);
+	var hh = 100;
+	var ww = 100;
+	var loadPhoto = new Image();
+	var playerL = null;
+	var playerR = null;
+	loadPhoto.width = ww;
+	loadPhoto.height = hh;
+	loadPhoto.src = "kai.png";
+	var samokai = new Image();
+	samokai.src = "kai.png";
+	document.addEventListener("keydown", affirmKeyDown);
 	
 	setInterval(controlState,33);
 	
 	function controlState(){
 		if(stateController == 0){
 			startScreen();
+			if(ww <= 300){
+				bigImage();
+			}
+			else{
+				showText();
+			}
 		}
 		else if(stateController == 1){
-			characterSelect();
+			characterSelectL();
+			canvas.addEventListener("click",handleClickL);
 		}
 		else if(stateController == 2){
+			characterSelectR();
+			canvas.addEventListener("click",handleClickR);
+		}
+		else if(stateController == 3){
 			playGame();
 		}
 	}
 	
-	function checkKeyDown(event){
+	function affirmKeyDown(event){
 		stateController++;
 		document.removeEventListener("keydown",affirmKeyDown);
+		console.log("peen");
 	}
 	
 	function startScreen(){
-		context.drawImage(loadPhoto,
+		context.drawImage(loadPhoto, (canvas.width/2-ww/2), (canvas.height/2-hh/2), hh, ww);
+		console.log(ww);
+	}
+	
+	function bigImage(){
+		hh++;
+		ww++;
+	}
+	
+	function showText(){
+		context.font = "50px Arial";
+		context.fillText("SAMO SHOWDOWN", canvas.width/2-250, canvas.height/2 + canvas.height/3 + 25);
+		context.font = "20px Arial";
+		context.fillText("Press any key to continue.", canvas.width/2-250, canvas.height/2 + canvas.height/3 + 50);
+	}
+	
+	function characterSelectL(){
+		context.clearRect(0,0,canvas.width,canvas.height);
+		context.font = "30px Arial";
+		context.fillText("CHARACTER SELECT (P1)", canvas.width/2-175, 50);
+		context.drawImage(samokai, 50,100,150,150);
+		context.fillText("SAMOKAI", 50, 100+150+30);
+	}
+	
+	function characterSelectR(){
+		context.clearRect(0,0,canvas.width,canvas.height);
+		context.font = "30px Arial";
+		context.fillText("CHARACTER SELECT (P2)", canvas.width/2-175, 50);
+		context.drawImage(samokai, 50,100,150,150);
+		context.fillText("SAMOKAI", 50, 100+150+30);
+	}
+	
+	function handleClickL(event){
+		console.log(event.x);
+		if(event.x>50 && event.x <210){
+			selectKaiL();
+		}
+		canvas.removeEventListener("click", handleClickL);
+		stateController++;
+	}	
+	
+	function handleClickR(event){
+		console.log(event.x);
+		if(event.x>50 && event.x <210){
+			selectKaiR();
+		}
+		canvas.removeEventListener("click", handleClickL);
+		stateController++;
+	}
+	
+	function selectKaiL(){
+		playerL = samokai;
+		console.log(playerL);
+	}
+	
+	function selectKaiR(){
+		playerR = samokai;
+		console.log(playerR);
 	}
 </script>

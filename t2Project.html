@@ -23,10 +23,11 @@ canvas {
 	var rX = canvas.width-200;
 	loadPhoto.width = ww;
 	loadPhoto.height = hh;
-	loadPhoto.src = "kai.png";
+	loadPhoto.src = "./fighter-stuff/kai.png";
 	var samokai = new Image();
-	samokai.src = "kai.png";
+	samokai.src = "./fighter-stuff/kai.png";
 	document.addEventListener("keydown", affirmKeyDown);
+	
 	
 	setInterval(controlState,33);
 	
@@ -51,6 +52,7 @@ canvas {
 		else if(stateController == 3){
 			playGame();
 			document.addEventListener("keydown", gameKeyPressed);
+			document.addEventListener("keyup", gameKeyReleased);
 		}
 	}
 	
@@ -114,11 +116,12 @@ canvas {
 	}
 	
 	function selectKaiR(){
-		playerR = samokai;
+		playerR = new RightSamokai();
 		console.log(playerR);
 		canvas.removeEventListener("click", handleClickR);
 		stateController++;
 	}
+	
 	
 	function drawBackground(){
 		context.clearRect(0,0,canvas.width,canvas.height);
@@ -131,19 +134,27 @@ canvas {
 	}
 	
 	function gameKeyPressed(event){
-		if(event.key == 'w' || event.key == 'a' || event.key == 's' || event.key == 'd'){
+		if(event.key == 'w' || (event.key == 'a' && playerL.movingLeft == false)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == false)){
 			playerL.checkMove(event);
-			if(event.key == 'a' || event.key == 'd'){
-			document.addEventListener("keyup",playerL.stopMove);
+			if((event.key == 'a' && playerL.movingLeft == false)|| (event.key == 'd' && playerL.movingRight == false)){
+			console.log("checks key up");
 			}
 		}
 		if(event.keyCode>=37 && event.keyCode <= 40){
-			movePlayerR();
+			playerR.checkMove(event);
 		}
 			
 			
 	}
 	
+	function gameKeyReleased(event){
+		if(event.key == 'w' || (event.key == 'a' && playerL.movingLeft == true)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == true)){
+			playerL.stopMove(event);
+		}
+		if(event.keyCode>=37 && event.keyCode <= 40){
+			playerR.stopMove(event);
+		}
+	}
 	
 	
 	function drawCharacters(){
@@ -151,23 +162,25 @@ canvas {
 			playerL.draw();
 			playerL.move();
 		}
-		if(playerR == samokai){
-			drawSamokaiR();
+		if(playerR.name == samokai){
+			playerR.draw();
+			playerR.move();
 		}
 	}
 	
-	
-	function drawSamokaiR(){
-		context.drawImage(samokai, rX, 100, 100,200);
-	}
-	
-	function LeftSamokai(){
+	function RightSamokai(){
 		this.name = samokai;
-		this.x = 100;
+		this.x = 1000;
 		this.y = 100;
 		this.movingRight = false;
 		this.movingLeft = false;
-		this.speed = 5;
+		this.speed = 9;
+		this.walking = new Image();
+		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
+		this.totalImagesWalking = 4;
+		this.currentImagePos = 0;
+		this.subImageHeight = 100;
+		this.subImageWidth = 100;
 		
 		this.draw = function(){
 			context.drawImage(samokai, this.x, this.y, 100, 200);
@@ -185,13 +198,79 @@ canvas {
 		}
 		
 		this.checkMove = function(event){
-			if(event.key == 'a'){
+			if(event.keyCode == 37 && this.movingLeft == false){
 				this.movingLeft = true;
 				console.log("left start");
+				//document.removeEventListener
 				
 			}
-			if(event.key == 'd'){
+			if(event.keyCode == 39 && this.movingRight == false){
 				this.movingRight = true;
+				console.log("right start");
+				//console.log(this.x);
+			}
+			if(event.key == 'w'){
+				//playerLJump();
+			}
+			if(event.key == 's'){
+				//playerLBlock();
+			}
+		}
+		
+	
+	
+		this.stopMove = function(event){
+			if(event.keyCode == 37 && this.movingLeft == true){
+				this.movingLeft = false;
+				console.log("left stop @ " + this.x);
+			}
+			if(event.keyCode == 39 && this.movingRight == true){
+				this.movingRight = false;
+				console.log("right stop @ " + this.x);
+			}
+		}
+	}
+	
+	function LeftSamokai(){
+		this.name = samokai;
+		this.x = 100;
+		this.y = 100;
+		this.movingRight = false;
+		this.movingLeft = false;
+		this.speed = 9;
+		this.walking = new Image();
+		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
+		this.totalImagesWalking = 4;
+		this.currentImagePos = 0;
+		this.subImageHeight = 100;
+		this.subImageWidth = 100;
+		
+		this.draw = function(){
+			context.drawImage(samokai, this.x, this.y, 100, 200);
+		//	console.log('bemis');
+		}
+		
+		this.move = function(){
+			if(this.movingRight == true){
+				this.x += this.speed;
+				console.log('moving r');
+			}
+			if(this.movingLeft == true){
+				this.x -= this.speed;
+			}
+		}
+		
+		this.checkMove = function(event){
+			if(event.key == 'a' && this.movingLeft == false){
+				this.movingLeft = true;
+				console.log("left start");
+				//document.removeEventListener
+				
+			}
+			if(event.key == 'd' && this.movingRight == false){
+				this.movingRight = true;
+				console.log("right start");
+				console.log(this.x);
 			}
 			if(event.key == 'w'){
 				//playerLJump();
@@ -204,21 +283,18 @@ canvas {
 	
 	
 	this.stopMove = function(event){
-		if(event.key == 'a'){
+		if(event.key == 'a' && this.movingLeft == true){
 			this.movingLeft = false;
 			console.log("left stop @ " + this.x);
-			document.removeEventListener("keyup",playerL.stopMove);
 		}
-		if(event.key == 'd'){
+		if(event.key == 'd' && this.movingRight == true){
 			this.movingRight = false;
-			document.removeEventListener("keyup",playerL.stopMove);
+			console.log("right stop @ " + this.x);
 		}
 	}
-	}
-	
 		
 		
-		
+		}
 	
 	
 </script>

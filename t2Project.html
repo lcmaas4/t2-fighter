@@ -19,6 +19,8 @@ canvas {
 	var loadPhoto = new Image();
 	var playerL = null;
 	var playerR = null;
+	var lX = 100;
+	var rX = canvas.width-200;
 	loadPhoto.width = ww;
 	loadPhoto.height = hh;
 	loadPhoto.src = "kai.png";
@@ -48,6 +50,7 @@ canvas {
 		}
 		else if(stateController == 3){
 			playGame();
+			document.addEventListener("keydown", gameKeyPressed);
 		}
 	}
 	
@@ -59,7 +62,6 @@ canvas {
 	
 	function startScreen(){
 		context.drawImage(loadPhoto, (canvas.width/2-ww/2), (canvas.height/2-hh/2), hh, ww);
-		console.log(ww);
 	}
 	
 	function bigImage(){
@@ -95,26 +97,128 @@ canvas {
 		if(event.x>50 && event.x <210){
 			selectKaiL();
 		}
-		canvas.removeEventListener("click", handleClickL);
-		stateController++;
 	}	
 	
 	function handleClickR(event){
 		console.log(event.x);
 		if(event.x>50 && event.x <210){
 			selectKaiR();
-		}
-		canvas.removeEventListener("click", handleClickL);
-		stateController++;
+		}	
 	}
 	
 	function selectKaiL(){
-		playerL = samokai;
+		playerL = new LeftSamokai();
 		console.log(playerL);
+		canvas.removeEventListener("click", handleClickL);
+		stateController++;
 	}
 	
 	function selectKaiR(){
 		playerR = samokai;
 		console.log(playerR);
+		canvas.removeEventListener("click", handleClickR);
+		stateController++;
 	}
+	
+	function drawBackground(){
+		context.clearRect(0,0,canvas.width,canvas.height);
+	}
+	
+	function playGame(){
+		drawBackground();
+		drawCharacters();
+				
+	}
+	
+	function gameKeyPressed(event){
+		if(event.key == 'w' || event.key == 'a' || event.key == 's' || event.key == 'd'){
+			playerL.checkMove(event);
+			if(event.key == 'a' || event.key == 'd'){
+			document.addEventListener("keyup",playerL.stopMove);
+			}
+		}
+		if(event.keyCode>=37 && event.keyCode <= 40){
+			movePlayerR();
+		}
+			
+			
+	}
+	
+	
+	
+	function drawCharacters(){
+		if(playerL.name == samokai){
+			playerL.draw();
+			playerL.move();
+		}
+		if(playerR == samokai){
+			drawSamokaiR();
+		}
+	}
+	
+	
+	function drawSamokaiR(){
+		context.drawImage(samokai, rX, 100, 100,200);
+	}
+	
+	function LeftSamokai(){
+		this.name = samokai;
+		this.x = 100;
+		this.y = 100;
+		this.movingRight = false;
+		this.movingLeft = false;
+		this.speed = 5;
+		
+		this.draw = function(){
+			context.drawImage(samokai, this.x, this.y, 100, 200);
+		//	console.log('bemis');
+		}
+		
+		this.move = function(){
+			if(this.movingRight == true){
+				this.x += this.speed;
+				console.log('moving r');
+			}
+			if(this.movingLeft == true){
+				this.x -= this.speed;
+			}
+		}
+		
+		this.checkMove = function(event){
+			if(event.key == 'a'){
+				this.movingLeft = true;
+				console.log("left start");
+				
+			}
+			if(event.key == 'd'){
+				this.movingRight = true;
+			}
+			if(event.key == 'w'){
+				//playerLJump();
+			}
+			if(event.key == 's'){
+				//playerLBlock();
+			}
+		}
+		
+	
+	
+	this.stopMove = function(event){
+		if(event.key == 'a'){
+			this.movingLeft = false;
+			console.log("left stop @ " + this.x);
+			document.removeEventListener("keyup",playerL.stopMove);
+		}
+		if(event.key == 'd'){
+			this.movingRight = false;
+			document.removeEventListener("keyup",playerL.stopMove);
+		}
+	}
+	}
+	
+		
+		
+		
+	
+	
 </script>

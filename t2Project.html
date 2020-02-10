@@ -25,6 +25,8 @@ canvas {
 	loadPhoto.height = hh;
 	loadPhoto.src = "./fighter-stuff/kai.png";
 	var samokai = new Image();
+	var background = new Image();
+	background.src = "./fighter-stuff/background.jpg";
 	samokai.src = "./fighter-stuff/kai.png";
 	document.addEventListener("keydown", affirmKeyDown);
 	
@@ -125,6 +127,7 @@ canvas {
 	
 	function drawBackground(){
 		context.clearRect(0,0,canvas.width,canvas.height);
+		context.drawImage(background, 0 ,0 ,1200,600);
 	}
 	
 	function playGame(){

@@ -9,7 +9,7 @@ canvas {
 </style>
 
 <body>
-<canvas id="canvasID" width=1200 height=500></canvas>
+<canvas id="canvasID" width=1200 height=500> </canvas>
 <script>
 	var canvas = document.getElementById("canvasID");
 	var context = canvas.getContext("2d");
@@ -133,6 +133,8 @@ canvas {
 	function playGame(){
 		drawBackground();
 		drawCharacters();
+		drawHealthBars();
+		checkCollisions();
 				
 	}
 	
@@ -171,10 +173,42 @@ canvas {
 		}
 	}
 	
+	function checkCollisions(){
+		if(playerL.x + playerL.width >= playerR.x){
+			if(playerL.movingRight){
+				playerL.x -= playerL.speed;
+			}
+			if(playerR.movingLeft){
+				playerR.x += playerR.speed;
+			}
+		}
+		if(playerL.x <= 0){
+			playerL.x += playerL.speed;
+		}
+		if(playerR.x + playerR.width >= canvas.width){
+			playerR.x -= playerL.speed;
+		}
+	}
+	
+	function drawHealthBars(){
+		context.fillRect(25,25,150,50);
+		context.fillRect(canvas.width-225,25,150,50);
+		context.fillStyle = "#00FF00";
+		context.fillRect(50,35,playerL.health,30);
+		context.fillRect(canvas.width-200,35,playerR.health,30);
+		context.fillStyle="#FF0000";
+		context.fillRect(50+playerL.health,35,100-playerL.health,30);
+		context.fillRect(canvas.width-200+playerR.health,35,100-playerR.health,30);
+		context.fillStyle = "#000000";
+		
+	}
+	
 	function RightSamokai(){
 		this.name = samokai;
 		this.x = 1000;
-		this.y = 100;
+		this.y = 200;
+		this.width = 100;
+		this.health = 100;
 		this.movingRight = false;
 		this.movingLeft = false;
 		this.speed = 9;
@@ -186,7 +220,7 @@ canvas {
 		this.subImageWidth = 100;
 		
 		this.draw = function(){
-			context.drawImage(samokai, this.x, this.y, 100, 200);
+			context.drawImage(samokai, this.x, this.y, this.width, 200);
 		//	console.log('bemis');
 		}
 		
@@ -237,19 +271,38 @@ canvas {
 	function LeftSamokai(){
 		this.name = samokai;
 		this.x = 100;
-		this.y = 100;
+		this.y = 200;
+		this.width = 100;
 		this.movingRight = false;
 		this.movingLeft = false;
 		this.speed = 9;
+		this.health = 80;
 		this.walking = new Image();
 		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
 		this.totalImagesWalking = 4;
-		this.currentImagePos = 0;
+		this.currentImage = 0;
 		this.subImageHeight = 100;
 		this.subImageWidth = 100;
+		this.currentSpriteSheet = this.walking;
 		
 		this.draw = function(){
-			context.drawImage(samokai, this.x, this.y, 100, 200);
+		/*	var ssX = 0, ssY = 0;
+			
+			if(this.movingRight) {
+			ssX = this.currentImage * this.subImageWidth;
+			}
+			
+			else if(this.movingLeft) {
+				ssX = this.leftSpriteSheet.width - (this.currImage + 1)*this.imageWidth;
+			}
+			
+			context.drawImage( this.currentSpriteSheet, 
+						ssX , ssY, this.subImageWidth, this.subImageHeight, 
+						this.x, this.y, this.subImageWidth, this.subImageHeight );
+		this.currentImage++;
+		this.currentImage %= this.numbImages;
+			*/
+			context.drawImage(samokai, this.x, this.y, this.width, 200);
 		//	console.log('bemis');
 		}
 		
@@ -296,8 +349,9 @@ canvas {
 		}
 	}
 		
+	}
 		
-		}
+	
 	
 	
 </script>

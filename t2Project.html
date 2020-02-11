@@ -69,8 +69,8 @@ canvas {
 	}
 	
 	function bigImage(){
-		hh++;
-		ww++;
+		hh+=2;
+		ww+=2;
 	}
 	
 	function showText(){
@@ -141,9 +141,6 @@ canvas {
 	function gameKeyPressed(event){
 		if(event.key == 'w' || (event.key == 'a' && playerL.movingLeft == false)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == false)){
 			playerL.checkMove(event);
-			if((event.key == 'a' && playerL.movingLeft == false)|| (event.key == 'd' && playerL.movingRight == false)){
-			console.log("checks key up");
-			}
 		}
 		if(event.keyCode>=37 && event.keyCode <= 40){
 			playerR.checkMove(event);
@@ -153,7 +150,7 @@ canvas {
 	}
 	
 	function gameKeyReleased(event){
-		if(event.key == 'w' || (event.key == 'a' && playerL.movingLeft == true)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == true)){
+		if((event.key == 'a' && playerL.movingLeft == true)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == true)){
 			playerL.stopMove(event);
 		}
 		if(event.keyCode>=37 && event.keyCode <= 40){
@@ -203,14 +200,18 @@ canvas {
 		
 	}
 	
+	
 	function RightSamokai(){
 		this.name = samokai;
 		this.x = 1000;
 		this.y = 200;
 		this.width = 100;
 		this.health = 100;
+		this.maxJumpHeight = 200;
 		this.movingRight = false;
 		this.movingLeft = false;
+		this.isJumping = false;
+		this.peaked = false;
 		this.speed = 9;
 		this.walking = new Image();
 		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
@@ -232,6 +233,9 @@ canvas {
 			if(this.movingLeft == true){
 				this.x -= this.speed;
 			}
+			if(this.isJumping == true){
+				this.jump();
+			}
 		}
 		
 		this.checkMove = function(event){
@@ -246,13 +250,38 @@ canvas {
 				console.log("right start");
 				//console.log(this.x);
 			}
-			if(event.key == 'w'){
-				//playerLJump();
+			if(event.keyCode == 38 && this.isJumping == false){
+				this.isJumping = true;
+				console.log("yump");
 			}
 			if(event.key == 's'){
 				//playerLBlock();
 			}
 		}
+		
+		this.jump = function(){
+			
+			if(this.peaked && this.y > 200){
+				this.isJumping = false;
+				this.y = 200;
+				this.peaked = false;
+			}
+			
+			if(this.y <= 200-this.maxJumpHeight){
+				this.peaked = true;
+			}
+			this.doJump();
+			console.log("yumping");
+		}
+		
+		this.doJump = function(){
+			if(this.isJumping && !this.peaked){
+				this.y -= 10;
+			}
+			else if(this.isJumping && this.peaked){
+				this.y += 8;
+			}
+		} 
 		
 	
 	
@@ -275,6 +304,9 @@ canvas {
 		this.width = 100;
 		this.movingRight = false;
 		this.movingLeft = false;
+		this.isJumping = false;
+		this.peaked = false;
+		this.maxJumpHeight = 75;
 		this.speed = 9;
 		this.health = 80;
 		this.walking = new Image();
@@ -314,7 +346,34 @@ canvas {
 			if(this.movingLeft == true){
 				this.x -= this.speed;
 			}
+			if(this.isJumping){
+				this.jump();
+			}
 		}
+		
+		this.jump = function(){
+			
+			if(this.peaked && this.y > 200){
+				this.isJumping = false;
+				this.y = 200;
+				this.peaked = false;
+			}
+			
+			if(this.y <= 200-this.maxJumpHeight){
+				this.peaked = true;
+			}
+			this.doJump();
+			console.log("yumping");
+		}
+		
+		this.doJump = function(){
+			if(this.isJumping && !this.peaked){
+				this.y -= 10;
+			}
+			else if(this.isJumping && this.peaked){
+				this.y += 8;
+			}
+		} 
 		
 		this.checkMove = function(event){
 			if(event.key == 'a' && this.movingLeft == false){
@@ -328,9 +387,11 @@ canvas {
 				console.log("right start");
 				console.log(this.x);
 			}
-			if(event.key == 'w'){
-				//playerLJump();
-			}
+			if(event.key == 'w' && !this.isJumping){
+				this.isJumping = true;	
+				console.log("yump");
+				}
+			
 			if(event.key == 's'){
 				//playerLBlock();
 			}
@@ -348,6 +409,7 @@ canvas {
 			console.log("right stop @ " + this.x);
 		}
 	}
+	
 		
 	}
 		

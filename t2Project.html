@@ -6,10 +6,40 @@
 canvas {
 	border:2px solid red;
 }
+#canvaswrap{
+	position: relative;
+}
+#overlay{
+	position: absolute;
+	left: 100px;
+	top: 300px;
+	height: 100px;
+	width: 200px;
+	background-color;
+	font: Arial;
+	font-size: 30px;
+	color: white;
+	font-weight: bold;
+}
+#overlay2{
+	position: absolute;
+	left: 900px;
+	top: 300px;
+	height: 100px;
+	width: 200px;
+	font: Arial;
+	font-size: 30px;
+	color: white;
+	font-weight: bold;
+}
 </style>
 
 <body>
-<canvas id="canvasID" width=1200 height=500> </canvas>
+	<div id='canvaswrap'>
+		<canvas id="canvasID" width=1200 height=500> </canvas>
+		<div id= 'overlay' onclick='rematch()'></div>
+		<div id = 'overlay2' onclick='backToSelect()'></div>
+	</div>
 <script>
 	var canvas = document.getElementById("canvasID");
 	var context = canvas.getContext("2d");
@@ -56,6 +86,9 @@ canvas {
 			document.addEventListener("keydown", gameKeyPressed);
 			document.addEventListener("keyup", gameKeyReleased);
 		}
+		else if(stateController == 4){
+			endGame();
+		}
 	}
 	
 	function affirmKeyDown(event){
@@ -97,14 +130,14 @@ canvas {
 	}
 	
 	function handleClickL(event){
-		console.log(event.x);
+		//console.log(event.x);
 		if(event.x>50 && event.x <210){
 			selectKaiL();
 		}
 	}	
 	
 	function handleClickR(event){
-		console.log(event.x);
+		//console.log(event.x);
 		if(event.x>50 && event.x <210){
 			selectKaiR();
 		}	
@@ -130,13 +163,79 @@ canvas {
 		context.drawImage(background, 0 ,0 ,1200,600);
 	}
 	
+	function checkWin(){
+		if(playerL.health <= 0){
+			document.removeEventListener("keydown", gameKeyPressed);
+			document.removeEventListener("keyup", gameKeyReleased);
+			document.getElementById('overlay').style.backgroundColor = 'red';
+			document.getElementById('overlay2').style.backgroundColor = '#FF0000';
+			//console.log('gothere');
+			document.getElementById('overlay').innerHTML = 'REMATCH';
+			document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+			stateController++;
+			playerR.win = true;
+			}
+		else if(playerR.health <= 0){
+			stateController++;
+			playerL.win = true;
+			document.getElementById('overlay').style.backgroundColor = 'red';
+			document.getElementById('overlay2').style.backgroundColor = '#FF0000';
+			//console.log('gothere');
+			document.getElementById('overlay').innerHTML = 'REMATCH';
+			document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+			document.removeEventListener("keydown", gameKeyPressed);
+			document.removeEventListener("keyup", gameKeyReleased);
+			document.getElementById('overlay:hover').style.backgroundColor = 'green';
+			document.getElementById('overlay2:hover').style.backgroundColor = 'green';
+		}
+	}
+	
+	function rematch(){
+		playerL.health = 100;
+		playerR.health = 100;
+		stateController = 3;
+		playerL.x = 100;
+		playerR.x = 1000;
+		document.getElementById('overlay').style.backgroundColor = '';
+		document.getElementById('overlay2').style.backgroundColor = '';
+		document.getElementById('overlay').innerHTML = '';
+		document.getElementById('overlay2').innerHTML = '';
+	}
+	
+	function backToSelect(){
+		stateController = 1;
+		document.getElementById('overlay').style.backgroundColor = '';
+		document.getElementById('overlay2').style.backgroundColor = '';
+		document.getElementById('overlay').innerHTML = '';
+		document.getElementById('overlay2').innerHTML = '';
+	}
+	
+	
+	function setLPunchTrue(){
+		playerL.canPunch = true;
+	}
+	
+	function setLKickTrue(){
+		playerL.canKick = true;
+	}
+	function setRPunchTrue(){
+		playerR.canPunch = true;
+	}
+	
+	function setRKickTrue(){
+		playerR.canKick = true;
+	}
+	
 	function playGame(){
 		drawBackground();
 		drawCharacters();
 		drawHealthBars();
 		checkCollisions();
+		checkWin();
+
 				
 	}
+	
 	
 	function gameKeyPressed(event){
 		if(event.key == 'w' || (event.key == 'a' && playerL.movingLeft == false)|| event.key == 's' || (event.key == 'd' && playerL.movingRight == false)){
@@ -144,6 +243,12 @@ canvas {
 		}
 		if(event.keyCode>=37 && event.keyCode <= 40){
 			playerR.checkMove(event);
+		}
+		if(event.key == 'z' || event.key == 'x' || event.key == 'c'){
+			playerL.checkHit(event);
+		}
+		if(event.key == 'm' || event.key == 'n' || event.key == 'b'){
+			playerR.checkHit(event);
 		}
 			
 			
@@ -155,6 +260,18 @@ canvas {
 		}
 		if(event.keyCode>=37 && event.keyCode <= 40){
 			playerR.stopMove(event);
+		}
+		if(event.key == 'x'){
+			playerL.isPunching = false;
+		}
+		if(event.key == 'c'){
+			playerL.isKicking = false;
+		}
+		if(event.key == 'n'){
+			playerR.isPunching = false;
+		}
+		if(event.key == 'm'){
+			playerR.isKicking = false;
 		}
 	}
 	
@@ -200,6 +317,24 @@ canvas {
 		
 	}
 	
+	function endGame(){
+		if(playerL.win){
+			drawBackground();
+			context.font = "100px Arial";
+			context.fillStyle = "FF0000";
+			context.fillText("LEFT PLAYER WIN", 150, canvas.height/2);
+			context.font = '50px Arial'
+			//context.fillText("Press R for a rematch.");
+			//context.fillText("Press S to reselect characters.");
+		}
+		else if(playerR.win){
+			drawBackground();
+			context.font = "100px Arial";
+			context.fillStyle = "FF0000";
+			context.fillText("RIGHT PLAYER WIN", 150, canvas.height/2);
+		}
+	}
+	
 	
 	function RightSamokai(){
 		this.name = samokai;
@@ -212,6 +347,12 @@ canvas {
 		this.movingLeft = false;
 		this.isJumping = false;
 		this.peaked = false;
+		this.win = false;
+		this.canKick = true;
+		this.isKicking = false;
+		this.canPunch = true;
+		this.isPunching = false;
+		this.isPunching = false;
 		this.speed = 9;
 		this.walking = new Image();
 		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
@@ -295,7 +436,45 @@ canvas {
 				console.log("right stop @ " + this.x);
 			}
 		}
+		
+		this.checkHit = function(event){
+			if(event.key == 'n' && this.canPunch && !this.isKicking){
+				setTimeout(setRPunchTrue, 1000);
+				this.punch();
+				this.isPunching = true;
+				//console.log(this.canPunch);
+			}
+			else if(event.key == 'm' && this.canKick && !this.isPunching){
+				setTimeout(setRKickTrue, 2000);
+				this.kick();
+				this.isKicking = true;
+			}
+			else if(event.key == 'z'){
+				this.special;
+			}
 	}
+	
+		this.punch = function(){
+			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
+				playerL.health -= 5;
+				this.canPunch = false;
+				this.isPunching = false;
+				
+		}
+	
+	}
+	
+		this.kick = function(){
+			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 100 && this.canKick && this.isPunching == false){
+				playerL.health -= 10;
+				this.canKick = false;
+				this.isKicking = false;
+		}
+	}
+	}
+	
 	
 	function LeftSamokai(){
 		this.name = samokai;
@@ -306,9 +485,14 @@ canvas {
 		this.movingLeft = false;
 		this.isJumping = false;
 		this.peaked = false;
-		this.maxJumpHeight = 75;
+		this.win = false;
+		this.canPunch = true;
+		this.canKick = true;
+		this.isPunching = false;
+		this.isKicking = false;
+		this.maxJumpHeight = 150;
 		this.speed = 9;
-		this.health = 80;
+		this.health = 20;
 		this.walking = new Image();
 		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
 		this.totalImagesWalking = 4;
@@ -378,18 +562,18 @@ canvas {
 		this.checkMove = function(event){
 			if(event.key == 'a' && this.movingLeft == false){
 				this.movingLeft = true;
-				console.log("left start");
+				//console.log("left start");
 				//document.removeEventListener
 				
 			}
 			if(event.key == 'd' && this.movingRight == false){
 				this.movingRight = true;
-				console.log("right start");
-				console.log(this.x);
+				//console.log("right start");
+				//console.log(this.x);
 			}
 			if(event.key == 'w' && !this.isJumping){
 				this.isJumping = true;	
-				console.log("yump");
+				//console.log("yump");
 				}
 			
 			if(event.key == 's'){
@@ -410,7 +594,44 @@ canvas {
 		}
 	}
 	
-		
+	this.checkHit = function(event){
+		if(event.key == 'x' && this.canPunch && !this.isKicking){
+			setTimeout(setLPunchTrue, 1000);
+			this.punch();
+			this.isPunching = true;
+			//console.log(this.canPunch);
+		}
+		else if(event.key == 'c' && this.canKick && !this.isPunching){
+			setTimeout(setLKickTrue, 2000);
+			this.kick();
+			this.isKicking = true;
+		}
+		else if(event.key == 'z'){
+			this.special;
+		}
+	}
+	
+	this.punch = function(){
+		if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
+				playerR.health -= 5;
+				this.canPunch = false;
+				this.isPunching = false;
+				
+		}
+	
+	}
+	
+	this.kick = function(){
+		if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 100 && this.canKick && this.isPunching == false){
+				playerR.health -= 10;
+				this.canKick = false;
+				this.isKicking = false;
+		}
+	}
+	
+	
 	}
 		
 	

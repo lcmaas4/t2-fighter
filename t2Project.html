@@ -56,9 +56,12 @@ canvas {
 	loadPhoto.src = "./fighter-stuff/kai.png";
 	var samokai = new Image();
 	var background = new Image();
+	var thickSamokai = new Image();
 	background.src = "./fighter-stuff/background.jpg";
 	samokai.src = "./fighter-stuff/kai.png";
+	thickSamokai.src = "./fighter-stuff/ok.jpg";
 	document.addEventListener("keydown", affirmKeyDown);
+	context.textAlign = 'center';
 	
 	
 	setInterval(controlState,33);
@@ -87,6 +90,24 @@ canvas {
 			document.addEventListener("keyup", gameKeyReleased);
 		}
 		else if(stateController == 4){
+			drawBackground();
+			context.font = '100px Arial';
+			context.fillStyle = 'red';
+			context.fillText("ROUND 2", 600, 100);
+		}
+		else if(stateController == 5){
+			playGame();
+		}
+		else if(stateController == 6){
+			drawBackground();
+			context.font = '100px Arial';
+			context.fillStyle = 'red';
+			context.fillText("ROUND 3", 600, 100);
+		}
+		else if(stateController == 7){
+			playGame();
+		}
+		else if(stateController == 8){
 			endGame();
 		}
 	}
@@ -108,39 +129,54 @@ canvas {
 	
 	function showText(){
 		context.font = "50px Arial";
-		context.fillText("SAMO SHOWDOWN", canvas.width/2-250, canvas.height/2 + canvas.height/3 + 25);
+		context.fillText("SAMO SHOWDOWN", canvas.width/2, canvas.height/2 + canvas.height/3 + 25);
 		context.font = "20px Arial";
-		context.fillText("Press any key to continue.", canvas.width/2-250, canvas.height/2 + canvas.height/3 + 50);
+		context.fillText("Press any key to continue.", canvas.width/2, canvas.height/2 + canvas.height/3 + 50);
 	}
 	
 	function characterSelectL(){
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.font = "30px Arial";
-		context.fillText("CHARACTER SELECT (P1)", canvas.width/2-175, 50);
+		context.fillText("CHARACTER SELECT (P1)", canvas.width/2, 50);
 		context.drawImage(samokai, 50,100,150,150);
+		context.textAlign='left'
 		context.fillText("SAMOKAI", 50, 100+150+30);
+		context.drawImage(thickSamokai, 300,100,150,150);
+		context.fillText("THICK SAMOKAI", 260, 100+150+30);
+		context.textAlign = 'center';
 	}
 	
 	function characterSelectR(){
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.font = "30px Arial";
+		context.textAlign = 'left';
 		context.fillText("CHARACTER SELECT (P2)", canvas.width/2-175, 50);
 		context.drawImage(samokai, 50,100,150,150);
 		context.fillText("SAMOKAI", 50, 100+150+30);
+		context.drawImage(thickSamokai, 300,100,150,150);
+		context.fillText("THICK SAMOKAI", 260, 100+150+30);
+		context.textAlign = 'center';
 	}
 	
 	function handleClickL(event){
 		//console.log(event.x);
-		if(event.x>50 && event.x <210){
+		if(event.x>50 && event.x <200 && event.y > 50 && event.y < 200){
 			selectKaiL();
+		}
+		else if(event.x>300 && event.x<450 && event.y>50 && event.y < 200){
+			selectThickKaiL();
+			console.log('thickkaiL');
 		}
 	}	
 	
 	function handleClickR(event){
 		//console.log(event.x);
-		if(event.x>50 && event.x <210){
+		if(event.x>50 && event.x <200 && event.y > 50 && event.y<200){
 			selectKaiR();
-		}	
+		}
+		else if(event.x>300 && event.x<450 && event.y>50 && event.y < 200){
+			selectThickKaiR();
+		}
 	}
 	
 	function selectKaiL(){
@@ -157,28 +193,94 @@ canvas {
 		stateController++;
 	}
 	
+	function selectThickKaiL(){
+		playerL = new LeftThickSamokai();
+		console.log(playerL);
+		canvas.removeEventListener("click", handleClickL);
+		stateController++;
+	}
+	
+	function selectThickKaiR(){
+		playerR = new RightThickSamokai();
+		console.log(playerR);
+		canvas.removeEventListener("click", handleClickR);
+		stateController++;
+	}
 	
 	function drawBackground(){
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.drawImage(background, 0 ,0 ,1200,600);
 	}
 	
+	function advanceState(){
+		stateController++;
+	}
+	
 	function checkWin(){
 		if(playerL.health <= 0){
-			document.removeEventListener("keydown", gameKeyPressed);
+			/*document.removeEventListener("keydown", gameKeyPressed);
 			document.removeEventListener("keyup", gameKeyReleased);
 			document.getElementById('overlay').style.backgroundColor = 'red';
 			document.getElementById('overlay2').style.backgroundColor = '#FF0000';
 			//console.log('gothere');
 			document.getElementById('overlay').innerHTML = 'REMATCH';
-			document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+			document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';*/
 			stateController++;
-			playerR.win = true;
+			playerR.win++;
+			if(playerL.win == 2 || playerR.win == 2){
+				stateController = 8;
+				document.getElementById('overlay').style.backgroundColor = 'red';
+		document.getElementById('overlay2').style.backgroundColor = '#FF0000';
+		//console.log('gothere');
+		document.getElementById('overlay').innerHTML = 'REMATCH';
+		document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+		document.removeEventListener("keydown", gameKeyPressed);
+		document.removeEventListener("keyup", gameKeyReleased);
+		document.getElementById('overlay').onmouseover = function(){document.getElementById('overlay').style.backgroundColor = 'green';};
+		document.getElementById('overlay').onmouseleave = function(){document.getElementById('overlay').style.backgroundColor = 'red';};
+		document.getElementById('overlay2').onmouseover = function(){document.getElementById('overlay2').style.backgroundColor = 'green';};
+		document.getElementById('overlay2').onmouseleave = function(){document.getElementById('overlay2').style.backgroundColor = 'red';};
 			}
+			
+			else if(playerL.win == 1 && playerR.win == 1){
+				setTimeout(advanceState,3000);
+				playerL.x = 100;
+				playerR.x = 1200-playerR.width-100;
+				if(playerL.name == thickSamokai){
+					playerL.health = 125;
+				}
+				else{
+					playerL.health = 100;
+				}
+				if(playerR.name == thickSamokai){
+					playerR.health = 125;
+				}
+				else{
+					playerR.health = 100;
+				}
+			}
+			else if(playerL.win == 1 || playerR.win == 1){
+				setTimeout(advanceState, 3000);
+				playerL.x = 100;
+				playerR.x = 1200-playerR.width-100;
+				if(playerL.name == thickSamokai){
+					playerL.health = 125;
+				}
+				else{
+					playerL.health = 100;
+				}
+				if(playerR.name == thickSamokai){
+					playerR.health = 125;
+				}
+				else{
+					playerR.health = 100;
+				}
+			}
+		}
 		else if(playerR.health <= 0){
 			stateController++;
-			playerL.win = true;
-			document.getElementById('overlay').style.backgroundColor = 'red';
+			playerL.win++;
+			/*document.getElementById('overlay').style.backgroundColor = 'red';
 			document.getElementById('overlay2').style.backgroundColor = '#FF0000';
 			//console.log('gothere');
 			document.getElementById('overlay').innerHTML = 'REMATCH';
@@ -186,18 +288,61 @@ canvas {
 			document.removeEventListener("keydown", gameKeyPressed);
 			document.removeEventListener("keyup", gameKeyReleased);
 			document.getElementById('overlay:hover').style.backgroundColor = 'green';
-			document.getElementById('overlay2:hover').style.backgroundColor = 'green';
+			document.getElementById('overlay2:hover').style.backgroundColor = 'green';*/
+			if(playerL.win == 2 || playerR.win == 2){
+				stateController = 8;
+			}
+			else if(playerL.win == 1 && playerR.win == 1){
+				setTimeout(advanceState,3000);
+				playerL.x = 100;
+				playerR.x = 1200-playerR.width-100;
+				if(playerL.name == thickSamokai){
+					playerL.health = 125;
+				}
+				else{
+					playerL.health = 100;
+				}
+				if(playerR.name == thickSamokai){
+					playerR.health = 125;
+				}
+				else{
+					playerR.health = 100;
+				}
+			}
+			else if(playerL.win == 1 || playerR.win == 1){
+				setTimeout(advanceState, 3000);
+				playerL.x = 100;
+				playerR.x = 1200-playerR.width-100;
+				if(playerL.name == thickSamokai){
+					playerL.health = 125;
+				}
+				else{
+					playerL.health = 100;
+				}
+				if(playerR.name == thickSamokai){
+					playerR.health = 125;
+				}
+				else{
+					playerR.health = 100;
+				}
+			}
 		}
 	}
 	
 	function rematch(){
 		playerL.health = 100;
 		playerR.health = 100;
+		playerL.win = 0;
+		playerR.win = 0;
 		stateController = 3;
 		playerL.x = 100;
 		playerR.x = 1000;
 		document.getElementById('overlay').style.backgroundColor = '';
 		document.getElementById('overlay2').style.backgroundColor = '';
+		document.getElementById('overlay').onmouseover = null;
+		document.getElementById('overlay2').onmouseover = null;
+		document.getElementById('overlay').onmouseleave = null;
+		document.getElementById('overlay2').onmouseleave = null;
 		document.getElementById('overlay').innerHTML = '';
 		document.getElementById('overlay2').innerHTML = '';
 	}
@@ -206,6 +351,10 @@ canvas {
 		stateController = 1;
 		document.getElementById('overlay').style.backgroundColor = '';
 		document.getElementById('overlay2').style.backgroundColor = '';
+		document.getElementById('overlay').onmouseover = null;
+		document.getElementById('overlay2').onmouseover = null;
+		document.getElementById('overlay').onmouseleave = null;
+		document.getElementById('overlay2').onmouseleave = null;
 		document.getElementById('overlay').innerHTML = '';
 		document.getElementById('overlay2').innerHTML = '';
 	}
@@ -277,14 +426,12 @@ canvas {
 	
 	
 	function drawCharacters(){
-		if(playerL.name == samokai){
 			playerL.draw();
 			playerL.move();
-		}
-		if(playerR.name == samokai){
+			
 			playerR.draw();
 			playerR.move();
-		}
+		
 	}
 	
 	function checkCollisions(){
@@ -318,20 +465,17 @@ canvas {
 	}
 	
 	function endGame(){
-		if(playerL.win){
+		if(playerL.win == 2){
 			drawBackground();
 			context.font = "100px Arial";
 			context.fillStyle = "FF0000";
-			context.fillText("LEFT PLAYER WIN", 150, canvas.height/2);
-			context.font = '50px Arial'
-			//context.fillText("Press R for a rematch.");
-			//context.fillText("Press S to reselect characters.");
+			context.fillText("LEFT PLAYER WIN", 600, canvas.height/2);
 		}
-		else if(playerR.win){
+		else if(playerR.win == 2){
 			drawBackground();
 			context.font = "100px Arial";
 			context.fillStyle = "FF0000";
-			context.fillText("RIGHT PLAYER WIN", 150, canvas.height/2);
+			context.fillText("RIGHT PLAYER WIN", 600, canvas.height/2);
 		}
 	}
 	
@@ -347,7 +491,7 @@ canvas {
 		this.movingLeft = false;
 		this.isJumping = false;
 		this.peaked = false;
-		this.win = false;
+		this.win = 0;
 		this.canKick = true;
 		this.isKicking = false;
 		this.canPunch = true;
@@ -412,7 +556,7 @@ canvas {
 				this.peaked = true;
 			}
 			this.doJump();
-			console.log("yumping");
+			//console.log("yumping");
 		}
 		
 		this.doJump = function(){
@@ -485,7 +629,7 @@ canvas {
 		this.movingLeft = false;
 		this.isJumping = false;
 		this.peaked = false;
-		this.win = false;
+		this.win = 0;
 		this.canPunch = true;
 		this.canKick = true;
 		this.isPunching = false;
@@ -633,8 +777,304 @@ canvas {
 	
 	
 	}
+	
+	
+	function RightThickSamokai() {
+		this.name = thickSamokai;
+		this.x = 1000;
+		this.y = 150;
+		this.width = 200;
+		this.health = 100;
+		this.maxJumpHeight = 200;
+		this.movingRight = false;
+		this.movingLeft = false;
+		this.isJumping = false;
+		this.peaked = false;
+		this.win = 0;
+		this.canKick = true;
+		this.isKicking = false;
+		this.canPunch = true;
+		this.isPunching = false;
+		this.isPunching = false;
+		this.speed = 5;
+		this.walking = new Image();
+		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
+		this.totalImagesWalking = 4;
+		this.currentImagePos = 0;
+		this.subImageHeight = 100*5/4;
+		this.subImageWidth = 100;
+		
+		this.draw = function(){
+			context.drawImage(thickSamokai, this.x, this.y, this.width, 250);
+		//	console.log('bemis');
+		}
+		
+		this.move = function(){
+			if(this.movingRight == true){
+				this.x += this.speed;
+				console.log('moving r');
+			}
+			if(this.movingLeft == true){
+				this.x -= this.speed;
+			}
+			if(this.isJumping == true){
+				this.jump();
+			}
+		}
+		
+		this.checkMove = function(event){
+			if(event.keyCode == 37 && this.movingLeft == false){
+				this.movingLeft = true;
+				console.log("left start");
+				//document.removeEventListener
+				
+			}
+			if(event.keyCode == 39 && this.movingRight == false){
+				this.movingRight = true;
+				console.log("right start");
+				//console.log(this.x);
+			}
+			if(event.keyCode == 38 && this.isJumping == false){
+				this.isJumping = true;
+				console.log("yump");
+			}
+			if(event.key == 's'){
+				//playerLBlock();
+			}
+		}
+		
+		this.jump = function(){
+			
+			if(this.peaked && this.y > 150){
+				this.isJumping = false;
+				this.y = 150;
+				this.peaked = false;
+			}
+			
+			if(this.y <= 200-this.maxJumpHeight){
+				this.peaked = true;
+			}
+			this.doJump();
+			//console.log("yumping");
+		}
+		
+		this.doJump = function(){
+			if(this.isJumping && !this.peaked){
+				this.y -= 10;
+			}
+			else if(this.isJumping && this.peaked){
+				this.y += 8;
+			}
+		} 
 		
 	
 	
+		this.stopMove = function(event){
+			if(event.keyCode == 37 && this.movingLeft == true){
+				this.movingLeft = false;
+				//console.log("left stop @ " + this.x);
+			}
+			if(event.keyCode == 39 && this.movingRight == true){
+				this.movingRight = false;
+				//console.log("right stop @ " + this.x);
+			}
+		}
+		
+		this.checkHit = function(event){
+			if(event.key == 'n' && this.canPunch && !this.isKicking){
+				setTimeout(setRPunchTrue, 1500);
+				this.punch();
+				this.isPunching = true;
+				//console.log(this.canPunch);
+			}
+			else if(event.key == 'm' && this.canKick && !this.isPunching){
+				setTimeout(setRKickTrue, 2500);
+				this.kick();
+				this.isKicking = true;
+			}
+			else if(event.key == 'z'){
+				this.special;
+			}
+	}
+	
+		this.punch = function(){
+			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
+				playerL.health -= 10;
+				this.canPunch = false;
+				this.isPunching = false;
+				
+		}
+	
+	}
+	
+		this.kick = function(){
+			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 100 && this.canKick && this.isPunching == false){
+				playerL.health -= 15;
+				this.canKick = false;
+				this.isKicking = false;
+		}
+	}
+	}
+	
+	function LeftThickSamokai(){
+		this.name = thickSamokai;
+		this.x = 100;
+		this.y = 150;
+		this.width = 200;
+		this.movingRight = false;
+		this.movingLeft = false;
+		this.isJumping = false;
+		this.peaked = false;
+		this.win = 0;
+		this.canPunch = true;
+		this.canKick = true;
+		this.isPunching = false;
+		this.isKicking = false;
+		this.maxJumpHeight = 150;
+		this.speed = 5;
+		this.health = 125;
+		this.walking = new Image();
+		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
+		this.totalImagesWalking = 4;
+		this.currentImage = 0;
+		this.subImageHeight = 100*5/4;
+		this.subImageWidth = 100;
+		this.currentSpriteSheet = this.walking;
+		
+		this.draw = function(){
+		/*	var ssX = 0, ssY = 0;
+			
+			if(this.movingRight) {
+			ssX = this.currentImage * this.subImageWidth;
+			}
+			
+			else if(this.movingLeft) {
+				ssX = this.leftSpriteSheet.width - (this.currImage + 1)*this.imageWidth;
+			}
+			
+			context.drawImage( this.currentSpriteSheet, 
+						ssX , ssY, this.subImageWidth, this.subImageHeight, 
+						this.x, this.y, this.subImageWidth, this.subImageHeight );
+		this.currentImage++;
+		this.currentImage %= this.numbImages;
+			*/
+			context.drawImage(thickSamokai, this.x, this.y, this.width, 250);
+		//	console.log('bemis');
+		}
+		
+		this.move = function(){
+			if(this.movingRight == true){
+				this.x += this.speed;
+				console.log('moving r');
+			}
+			if(this.movingLeft == true){
+				this.x -= this.speed;
+			}
+			if(this.isJumping){
+				this.jump();
+			}
+		}
+		
+		this.jump = function(){
+			
+			if(this.peaked && this.y > 150){
+				this.isJumping = false;
+				this.y = 150;
+				this.peaked = false;
+			}
+			
+			if(this.y <= 200-this.maxJumpHeight){
+				this.peaked = true;
+			}
+			this.doJump();
+			console.log("yumping");
+		}
+		
+		this.doJump = function(){
+			if(this.isJumping && !this.peaked){
+				this.y -= 10;
+			}
+			else if(this.isJumping && this.peaked){
+				this.y += 8;
+			}
+		} 
+		
+		this.checkMove = function(event){
+			if(event.key == 'a' && this.movingLeft == false){
+				this.movingLeft = true;
+				//console.log("left start");
+				//document.removeEventListener
+				
+			}
+			if(event.key == 'd' && this.movingRight == false){
+				this.movingRight = true;
+				//console.log("right start");
+				//console.log(this.x);
+			}
+			if(event.key == 'w' && !this.isJumping){
+				this.isJumping = true;	
+				//console.log("yump");
+				}
+			
+			if(event.key == 's'){
+				//playerLBlock();
+			}
+		}
+		
+	
+	
+	this.stopMove = function(event){
+		if(event.key == 'a' && this.movingLeft == true){
+			this.movingLeft = false;
+			console.log("left stop @ " + this.x);
+		}
+		if(event.key == 'd' && this.movingRight == true){
+			this.movingRight = false;
+			console.log("right stop @ " + this.x);
+		}
+	}
+	
+	this.checkHit = function(event){
+		if(event.key == 'x' && this.canPunch && !this.isKicking){
+			setTimeout(setLPunchTrue, 1500);
+			this.punch();
+			this.isPunching = true;
+			console.log(this.canPunch);
+		}
+		else if(event.key == 'c' && this.canKick && !this.isPunching){
+			setTimeout(setLKickTrue, 2000);
+			this.kick();
+			this.isKicking = true;
+		}
+		else if(event.key == 'z'){
+			this.special;
+		}
+	}
+	
+	this.punch = function(){
+		if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
+				playerR.health -= 10;
+				this.canPunch = false;
+				this.isPunching = false;
+				console.log
+				
+		}
+	
+	}
+	
+	this.kick = function(){
+		if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
+		   (playerR.x - playerL.x - playerL.width) <= 100 && this.canKick && this.isPunching == false){
+				playerR.health -= 10;
+				this.canKick = false;
+				this.isKicking = false;
+		}
+	}
+
+	}
+
 	
 </script>

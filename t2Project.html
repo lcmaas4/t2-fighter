@@ -64,7 +64,7 @@ canvas {
 	context.textAlign = 'center';
 	
 	
-	setInterval(controlState,33);
+	setInterval(controlState,100);
 	
 	function controlState(){
 		if(stateController == 0){
@@ -123,8 +123,8 @@ canvas {
 	}
 	
 	function bigImage(){
-		hh+=2;
-		ww+=2;
+		hh+=12.5;
+		ww+=12.5;
 	}
 	
 	function showText(){
@@ -160,7 +160,7 @@ canvas {
 	
 	function handleClickL(event){
 		//console.log(event.x);
-		if(event.x>50 && event.x <200 && event.y > 50 && event.y < 200){
+		if(event.x>50 && event.x <250 && event.y > 50 && event.y < 250){
 			selectKaiL();
 		}
 		else if(event.x>300 && event.x<450 && event.y>50 && event.y < 200){
@@ -171,10 +171,10 @@ canvas {
 	
 	function handleClickR(event){
 		//console.log(event.x);
-		if(event.x>50 && event.x <200 && event.y > 50 && event.y<200){
+		if(event.x>50 && event.x <200 && event.y > 50 && event.y<250){
 			selectKaiR();
 		}
-		else if(event.x>300 && event.x<450 && event.y>50 && event.y < 200){
+		else if(event.x>300 && event.x<450 && event.y>50 && event.y < 250){
 			selectThickKaiR();
 		}
 	}
@@ -247,16 +247,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 125;
+					playerL.health = 30;
 				}
 				else{
-					playerL.health = 100;
+					playerL.health = 30;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 125;
+					playerR.health = 30;
 				}
 				else{
-					playerR.health = 100;
+					playerR.health = 30;
 				}
 			}
 			else if(playerL.win == 1 || playerR.win == 1){
@@ -264,16 +264,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 125;
+					playerL.health = 30;
 				}
 				else{
-					playerL.health = 100;
+					playerL.health = 30;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 125;
+					playerR.health = 30;
 				}
 				else{
-					playerR.health = 100;
+					playerR.health = 30;
 				}
 			}
 		}
@@ -330,8 +330,8 @@ canvas {
 	}
 	
 	function rematch(){
-		playerL.health = 100;
-		playerR.health = 100;
+		playerL.health = 30;
+		playerR.health = 30;
 		playerL.win = 0;
 		playerR.win = 0;
 		stateController = 3;
@@ -484,30 +484,48 @@ canvas {
 		this.name = samokai;
 		this.x = 1000;
 		this.y = 200;
-		this.width = 100;
-		this.health = 100;
-		this.maxJumpHeight = 200;
+		this.width = 120;
+		this.height = 250;
 		this.movingRight = false;
 		this.movingLeft = false;
 		this.isJumping = false;
 		this.peaked = false;
 		this.win = 0;
-		this.canKick = true;
-		this.isKicking = false;
 		this.canPunch = true;
+		this.canKick = true;
 		this.isPunching = false;
-		this.isPunching = false;
-		this.speed = 9;
+		this.isKicking = false;
+		this.maxJumpHeight = 100;
+		this.speed = 14;
+		this.health = 20;
+		this.standing = new Image();
+		this.standing.src = "./fighter-stuff/normalSamo_standing_right.png";
 		this.walking = new Image();
-		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
-		this.totalImagesWalking = 4;
-		this.currentImagePos = 0;
-		this.subImageHeight = 100;
-		this.subImageWidth = 100;
+		this.walking.src = "./fighter-stuff/normalSamo_walking_right.png";
+		this.numbImagesWalking = 4;
+		this.walkingWidth = 120;
+		this.currentImage = 0;
+		this.subImageWidth = 375;
+		this.subImageHeight = 800;
+		this.currentSpriteSheet = this.standing;
 		
 		this.draw = function(){
-			context.drawImage(samokai, this.x, this.y, this.width, 200);
-		//	console.log('bemis');
+			var ssX = 0;
+			
+			if(this.movingRight || this.movingLeft) {
+				this.currentSpriteSheet = this.walking;
+				this.width = this.walkingWidth;
+				ssX = this.currentImage * this.subImageWidth;
+			}
+			
+			else {
+				this.currentSpriteSheet = this.standing;
+				this.width = 120;
+			}
+			
+			context.drawImage(this.currentSpriteSheet, ssX , 0, this.subImageWidth, this.subImageHeight, this.x, this.y, this.width, this.height);
+			this.currentImage++;
+			this.currentImage %= this.numbImagesWalking;
 		}
 		
 		this.move = function(){
@@ -561,10 +579,10 @@ canvas {
 		
 		this.doJump = function(){
 			if(this.isJumping && !this.peaked){
-				this.y -= 10;
+				this.y -= 35;
 			}
 			else if(this.isJumping && this.peaked){
-				this.y += 8;
+				this.y += 50;
 			}
 		} 
 		
@@ -624,7 +642,8 @@ canvas {
 		this.name = samokai;
 		this.x = 100;
 		this.y = 200;
-		this.width = 100;
+		this.width = 120;
+		this.height = 250;
 		this.movingRight = false;
 		this.movingLeft = false;
 		this.isJumping = false;
@@ -634,36 +653,37 @@ canvas {
 		this.canKick = true;
 		this.isPunching = false;
 		this.isKicking = false;
-		this.maxJumpHeight = 150;
-		this.speed = 9;
+		this.maxJumpHeight = 100;
+		this.speed = 14;
 		this.health = 20;
+		this.standing = new Image();
+		this.standing.src = "./fighter-stuff/normalSamo_standing_left.png";
 		this.walking = new Image();
-		this.walking.src = "./fighter-stuff/normalSamo_walking_sprite.png";
-		this.totalImagesWalking = 4;
+		this.walking.src = "./fighter-stuff/normalSamo_walking_left.png";
+		this.numbImagesWalking = 4;
+		this.walkingWidth = 120;
 		this.currentImage = 0;
-		this.subImageHeight = 100;
-		this.subImageWidth = 100;
-		this.currentSpriteSheet = this.walking;
+		this.subImageWidth = 375;
+		this.subImageHeight = 800;
+		this.currentSpriteSheet = this.standing;
 		
 		this.draw = function(){
-		/*	var ssX = 0, ssY = 0;
-			
-			if(this.movingRight) {
-			ssX = this.currentImage * this.subImageWidth;
+			var ssX = 0;
+		
+			if(this.movingRight || this.movingLeft) {
+				this.currentSpriteSheet = this.walking;
+				this.width = this.walkingWidth;
+				ssX = this.currentImage * this.subImageWidth;
 			}
 			
-			else if(this.movingLeft) {
-				ssX = this.leftSpriteSheet.width - (this.currImage + 1)*this.imageWidth;
+			else {
+				this.currentSpriteSheet = this.standing;
+				this.width = 120;
 			}
 			
-			context.drawImage( this.currentSpriteSheet, 
-						ssX , ssY, this.subImageWidth, this.subImageHeight, 
-						this.x, this.y, this.subImageWidth, this.subImageHeight );
-		this.currentImage++;
-		this.currentImage %= this.numbImages;
-			*/
-			context.drawImage(samokai, this.x, this.y, this.width, 200);
-		//	console.log('bemis');
+			context.drawImage(this.currentSpriteSheet, ssX , 0, this.subImageWidth, this.subImageHeight, this.x, this.y, this.width, this.height);
+			this.currentImage++;
+			this.currentImage %= this.numbImagesWalking;
 		}
 		
 		this.move = function(){
@@ -696,10 +716,10 @@ canvas {
 		
 		this.doJump = function(){
 			if(this.isJumping && !this.peaked){
-				this.y -= 10;
+				this.y -= 40;
 			}
 			else if(this.isJumping && this.peaked){
-				this.y += 8;
+				this.y += 50;
 			}
 		} 
 		

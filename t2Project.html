@@ -512,17 +512,17 @@ canvas {
 		this.numbImagesWalking = 4;
 		
 		this.jumping = new Image();
-		this.jumping.src = "./fighter-stuff/normalSamo_jumping_left.png";	
-		this.jumpingWidth = 120;
-		this.jumpingImageWidth = 450;
+		this.jumping.src = "./fighter-stuff/normalSamo_jumping_right.png";	
+		this.jumpingWidth = 150;
+		this.jumpingImageWidth = 500;
 		this.jumpingImageHeight = 800;
 		this.currentImageJumping = 0;
 		this.numbImagesJumping = 5;
 		
 		this.draw = function(){
 			if(this.isJumping) {
-				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
-				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x, this.y, this.jumpingWidth, this.height);
+				var ssXJump = this.currentImageJumping * (this.jumpingImageWidth);
+				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x-20, this.y, this.jumpingWidth, this.height);
 				this.currentImageJumping++;
 				this.currentImageJumping %= this.numbImagesJumping;
 				console.log("yeet");
@@ -682,11 +682,11 @@ canvas {
 		
 		this.jumping = new Image();
 		this.jumping.src = "./fighter-stuff/normalSamo_jumping_left.png";	
-		this.jumpingWidth = 120;
-		this.jumpingImageWidth = 450;
+		this.jumpingWidth = 150;
+		this.jumpingImageWidth = 500;
 		this.jumpingImageHeight = 800;
 		this.currentImageJumping = 0;
-		this.numbImagesJumping = 5;
+		this.numbImagesJumping = 7;
 		this.draw = function(){
 			if(this.isJumping) {
 				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
@@ -721,10 +721,11 @@ canvas {
 		
 		this.jump = function(){
 			
-			if(this.peaked && this.y > 200){
+			if(this.peaked && this.y > 150){
 				this.isJumping = false;
 				this.y = 200;
 				this.peaked = false;
+				this.currentImageJumping = 0;
 			}
 			
 			if(this.y <= 200-this.maxJumpHeight){
@@ -736,7 +737,7 @@ canvas {
 		
 		this.doJump = function(){
 			if(this.isJumping && !this.peaked){
-				this.y -= 40;
+				this.y -= 35;
 			}
 			else if(this.isJumping && this.peaked){
 				this.y += 50;
@@ -988,7 +989,7 @@ canvas {
 						this.x, this.y, this.subImageWidth, this.subImageHeight );
 		this.currentImage++;
 		this.currentImage %= this.numbImages;
-			*/
+			
 			context.drawImage(thickSamokai, this.x, this.y, this.width, 250);
 		//	console.log('bemis');
 		}

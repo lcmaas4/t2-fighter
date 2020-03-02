@@ -704,6 +704,9 @@ canvas {
 				this.currentImagePunching++;
 				this.currentImagePunching %= this.numbImagesPunching;
 				console.log("yeet2");
+				
+				this.movingRight == false;
+				this.movingLeft == false;
 			}
 			if(this.isJumping && !this.isPunching) {
 				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
@@ -719,8 +722,7 @@ canvas {
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
 			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching){
-				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
-				
+				context.drawImage(this.standing, this.x, this.y, this.width, this.height);	
 			}
 		}
 		
@@ -732,7 +734,7 @@ canvas {
 			if(this.movingLeft == true){
 				this.x -= this.speed;
 			}
-			if(this.isJumping){
+			if(this.isJumping && !this.isPunching){
 				this.jump();
 			}
 		}

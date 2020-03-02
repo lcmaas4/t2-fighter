@@ -688,23 +688,43 @@ canvas {
 		this.currentImageJumping = 0;
 		this.numbImagesJumping = 7;
 		this.draw = function(){
-			if(this.isJumping) {
+		
+		this.punching = new Image();
+		this.punching.src = "./fighter-stuff/normalSamo_punching_left.png";	
+		this.punchingWidth = 200;
+		this.punchingImageWidth = 600;
+		this.punchingImageHeight = 800;
+		this.currentImagePunching = 0;
+		this.numbImagesPunching = 5;
+		
+		this.draw = function(){
+			if(this.canPunch && this.isPunching && !this.isJumping) {
+				var ssXPunch = this.currentImagePunching * this.punchingImageWidth;
+				context.drawImage(this.punching, ssXPunch, 0, this.punchingImageWidth, this.punchingImageHeight, this.x, this.y, this.punchingWidth, this.height);
+				this.currentImagePunching++;
+				this.currentImagePunching %= this.numbImagesPunching;
+				console.log("yeet2");
+				
+				this.movingRight == false;
+				this.movingLeft == false;
+			}
+			if(this.isJumping && !this.isPunching) {
 				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
 				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x, this.y, this.jumpingWidth, this.height);
 				this.currentImageJumping++;
 				this.currentImageJumping %= this.numbImagesJumping;
 				console.log("yeet");
 			}
-			if((this.movingRight || this.movingLeft) && !this.isJumping) {
+			if((this.movingRight || this.movingLeft) && (!this.isJumping && !this.isPunching)) {
 				var ssXWalk = this.currentImageWalking * this.walkingImageWidth;
 				context.drawImage(this.walking, ssXWalk, 0, this.walkingImageWidth, this.walkingImageHeight, this.x, this.y, this.walkingWidth, this.height);
 				this.currentImageWalking++;
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
-			if(!this.movingRight && !this.movingLeft && !this.isJumping){
-				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
-				
-	}
+			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching){
+				context.drawImage(this.standing, this.x, this.y, this.width, this.height);	
+			}
+		}
 		
 		this.move = function(){
 			if(this.movingRight == true){
@@ -714,13 +734,12 @@ canvas {
 			if(this.movingLeft == true){
 				this.x -= this.speed;
 			}
-			if(this.isJumping){
+			if(this.isJumping && !this.isPunching){
 				this.jump();
 			}
 		}
 		
 		this.jump = function(){
-			
 			if(this.peaked && this.y > 150){
 				this.isJumping = false;
 				this.y = 200;
@@ -777,21 +796,34 @@ canvas {
 			this.movingRight = false;
 			console.log("right stop @ " + this.x);
 		}
+		if(this.isPunching) {
+			this.movingRight = false;
+			this.movingLeft = false;
+		}
 	}
 	
 	this.checkHit = function(event){
+		if(!this.isKicking && !this.isJumping) {
+			this.canPunch = true;
+		}
+		else {
+			this.canPunch = false;
+		}
 		if(event.key == 'x' && this.canPunch && !this.isKicking){
 			setTimeout(setLPunchTrue, 1000);
 			this.punch();
 			this.isPunching = true;
 			//console.log(this.canPunch);
 		}
-		else if(event.key == 'c' && this.canKick && !this.isPunching){
+		else if(event.key != 'x') {
+			this.currentImagePunching = 0;
+		}
+		if(event.key == 'c' && this.canKick && !this.isPunching){
 			setTimeout(setLKickTrue, 2000);
 			this.kick();
 			this.isKicking = true;
 		}
-		else if(event.key == 'z'){
+		if(event.key == 'z'){
 			this.special;
 		}
 	}
@@ -802,6 +834,7 @@ canvas {
 				playerR.health -= 5;
 				this.canPunch = false;
 				this.isPunching = false;
+				this.currentImagePunching = 0;
 				
 		}
 	
@@ -1107,5 +1140,5 @@ canvas {
 
 	}
 
-	
+
 </script>

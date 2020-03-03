@@ -699,15 +699,43 @@ canvas {
 		this.isSpecialing = false;
 		this.canSpecial = false;
 		
+/*		this.kicking = new Image();
+		this.kicking.src = "./fighter-stuff/normalSamo_kicking_left.png";	
+		this.kickingWidth = 200;
+		this.kickingImageWidth = 650;
+		this.kickingImageHeight = 800;
+		this.currentImageKicking = 0;
+		this.numbImagesKicking = 4;
+		*/
 		this.draw = function(){
-			if(this.isJumping) {
+			if(this.canPunch && this.isPunching && !this.isJumping) {
+				var ssXPunch = this.currentImagePunching * this.punchingImageWidth;
+				context.drawImage(this.punching, ssXPunch, 0, this.punchingImageWidth, this.punchingImageHeight, this.x, this.y, this.punchingWidth, this.height);
+				this.currentImagePunching++;
+				this.currentImagePunching %= this.numbImagesPunching;
+				console.log("yeet2");
+				
+				this.movingRight == false;
+				this.movingLeft == false;
+			}
+	/*		if(this.canKick && this.isKicking && !this.isJumping && !this.isPunching) {
+				var ssXKick = this.currentImageKicking * this.kickingImageWidth;
+				context.drawImage(this.kicking, ssXKick, 0, this.kickingImageWidth, this.kickingImageHeight, this.x, this.y, this.kickingWidth, this.height);
+				this.currentImageKicking++;
+				this.currentImage %= this.numbImagesKicking;
+				console.log("yeet2");
+				
+				this.movingRight == false;
+				this.movingLeft == false;
+			}*/
+			if(this.isJumping && !this.isPunching) {
 				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
 				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x, this.y, this.jumpingWidth, this.height);
 				this.currentImageJumping++;
 				this.currentImageJumping %= this.numbImagesJumping;
 				console.log("yeet");
 			}
-			if((this.movingRight || this.movingLeft) && !this.isJumping) {
+			if((this.movingRight || this.movingLeft) && (!this.isJumping && !this.isPunching)) {
 				var ssXWalk = this.currentImageWalking * this.walkingImageWidth;
 				context.drawImage(this.walking, ssXWalk, 0, this.walkingImageWidth, this.walkingImageHeight, this.x, this.y, this.walkingWidth, this.height);
 				this.currentImageWalking++;

@@ -786,7 +786,15 @@ canvas {
 		this.currentImageJumping = 0;
 		this.numbImagesJumping = 7;
 		
-		this.specialCharge = 100;
+		this.punching = new Image();
+		this.punching.src = "./fighter-stuff/normalSamo_punching_left.png";	
+		this.punchingWidth = 200;
+		this.punchingImageWidth = 600;
+		this.punchingImageHeight = 800;
+		this.currentImagePunching = 0;
+		this.numbImagesPunching = 5;
+		
+		this.specialCharge = 110;
 		this.isSpecial = false;
 		this.isSpecialing = false;
 		this.canSpecial = false;
@@ -833,7 +841,7 @@ canvas {
 				this.currentImageWalking++;
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
-			if(!this.movingRight && !this.movingLeft && !this.isJumping){
+			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching){
 				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
 				
 	}

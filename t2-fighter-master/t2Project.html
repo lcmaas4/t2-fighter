@@ -452,17 +452,38 @@ canvas {
 		if(playerR.x + playerR.width >= canvas.width){
 			playerR.x -= playerL.speed;
 		}
+		if(playerR.specialCharge >= 100){
+			playerR.specialCharge = 100;
+			context.fillStyle = "#ccff00";
+			context.font = '20px Arial';
+			context.fillText("SPECIAL READY", 1100, 125+12.5);
+			context.fillStyle = "#000000"
+		}
+		if(playerL.specialCharge >= 100){
+			playerL.specialCharge = 100;
+			context.fillStyle = "#ccff00";
+			context.font = '20px Arial';
+			context.fillText("SPECIAL READY", 100, 125+12.5);
+			context.fillStyle = "#000000"
+		}
 	}
 	
 	function drawHealthBars(){
-		context.fillRect(25,25,150,50);
+		context.fillRect(25,25,1150,50);
 		context.fillRect(canvas.width-225,25,150,50);
-		context.fillStyle = "#00FF00";
-		context.fillRect(50,35,playerL.health,30);
-		context.fillRect(canvas.width-200,35,playerR.health,30);
 		context.fillStyle="#FF0000";
-		context.fillRect(50+playerL.health,35,100-playerL.health,30);
-		context.fillRect(canvas.width-200+playerR.health,35,100-playerR.health,30);
+		context.fillRect(50,35,(450)-(playerL.health*4.5),30);
+		context.fillRect(1150,35,-450,30);
+		context.fillStyle = "#00FF00";
+		context.fillRect(500,35,(-playerL.health)*5*.9,30);
+		context.fillRect(700,35,playerR.health*5*.9,30);
+		context.fillStyle = "#000000";
+		context.drawImage(loadPhoto,565.5,12.5,75,75);
+		context.fillRect(25+25,100-12.5,125,25);
+		context.fillRect(1075-25,100-12.5,125,25);
+		context.fillStyle = "#ccff00";
+		context.fillRect(25+6.25+25, 106.25-12.5, playerL.specialCharge, 12.5);
+		context.fillRect(1075+6.25-25,106.25-12.5,playerR.specialCharge,12.5);
 		context.fillStyle = "#000000";
 		
 	}
@@ -498,10 +519,14 @@ canvas {
 		this.isPunching = false;
 		this.isKicking = false;
 		this.isCrouching = false;
+		this.isSpecial = false;
+		this.isSpecialing = false;
+		this.specialCharge = 100;
+		this.canSpecial = false;
 
 		this.maxJumpHeight = 100;
 		this.speed = 14;
-		this.health = 20;
+		this.health = 100;
 		
 		this.standing = new Image();
 		this.standing.src = "./fighter-stuff/normalSamo_standing_right.png";
@@ -554,6 +579,9 @@ canvas {
 			}
 			if(this.isJumping == true){
 				this.jump();
+			}
+			if(this.isSpecialing){
+				this.special();
 			}
 		}
 		
@@ -613,6 +641,9 @@ canvas {
 				this.movingRight = false;
 				console.log("right stop @ " + this.x);
 			}
+			if(event.key = 'b' && this.isSpecialing){
+				this.isSpecialing = false;
+			}
 		}
 		
 		this.checkHit = function(event){
@@ -627,8 +658,8 @@ canvas {
 				this.kick();
 				this.isKicking = true;
 			}
-			else if(event.key == 'z'){
-				this.special;
+			else if(event.key == 'b' && this.specialCharge >= 100 && !playerL.isSpecialing){
+				this.isSpecialing = true;
 			}
 	}
 	
@@ -637,6 +668,8 @@ canvas {
 				playerL.health -= 5;
 				this.canPunch = false;
 				this.isPunching = false;
+				playerL.specialCharge += 5;
+				playerR.specialCharge += 2.5;
 			}
 		}
 		this.kick = function(){
@@ -645,8 +678,68 @@ canvas {
 				playerL.health -= 10;
 				this.canKick = false;
 				this.isKicking = false;
+				playerL.specialCharge += 10;
+				playerR.specialCharge += 5;
+		}
+		}
+		
+		this.special = function(){
+		
+		if(!this.canSpecial){
+			this.isCharging = true;
+			
+			setTimeout(setRSpecialTrue, 3000);
+			
+			if(this.movingRight || this.movingLeft){
+				this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+			}
+		}
+		
+		else if(this.canSpecial){
+		
+			if(!this.isSpecial){
+				this.startX = this.x;
+				console.log(this.startX);
+			}
+		
+			this.isSpecial = true;
+		
+			if(this.isSpecial){
+				this.chefsSpecial();
+			}
 		}
 	}
+
+	
+	this.chefsSpecial = function(){
+			if(playerL.x > playerR.x-this.width-50 && Math.abs(playerL.y - playerR.y) < 50){
+				this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+				playerL.health -= 50;
+				playerL.specialCharge += 20;
+				console.log("Near");
+		   }
+			else if(this.x > this.startX - 500 && this.canSpecial && playerL.x < playerR.x-this.width){
+				this.x -= this.speed*3;
+			}
+			else{
+				this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+			}
+			console.log("specialing");
+		}
+	}
+	
+	
+	function setRSpecialTrue(){
+		playerR.canSpecial = true;
 	}
 	
 	
@@ -670,7 +763,7 @@ canvas {
 		
 		this.maxJumpHeight = 100;
 		this.speed = 14;
-		this.health = 20;
+		this.health = 100;
 		
 		this.standing = new Image();
 		this.standing.src = "./fighter-stuff/normalSamo_standing_left.png";
@@ -693,9 +786,8 @@ canvas {
 		this.currentImageJumping = 0;
 		this.numbImagesJumping = 7;
 		
-		this.specialCharge = 110;
+		this.specialCharge = 100;
 		this.isSpecial = false;
-		this.canSpecial = true;
 		this.isSpecialing = false;
 		this.canSpecial = false;
 		
@@ -708,7 +800,7 @@ canvas {
 		this.numbImagesKicking = 4;
 		*/
 		this.draw = function(){
-			if(this.canPunch && this.isPunching && !this.isJumping) {
+			/*if(this.canPunch && this.isPunching && !this.isJumping) {
 				var ssXPunch = this.currentImagePunching * this.punchingImageWidth;
 				context.drawImage(this.punching, ssXPunch, 0, this.punchingImageWidth, this.punchingImageHeight, this.x, this.y, this.punchingWidth, this.height);
 				this.currentImagePunching++;
@@ -718,7 +810,7 @@ canvas {
 				this.movingRight == false;
 				this.movingLeft == false;
 			}
-	/*		if(this.canKick && this.isKicking && !this.isJumping && !this.isPunching) {
+			if(this.canKick && this.isKicking && !this.isJumping && !this.isPunching) {
 				var ssXKick = this.currentImageKicking * this.kickingImageWidth;
 				context.drawImage(this.kicking, ssXKick, 0, this.kickingImageWidth, this.kickingImageHeight, this.x, this.y, this.kickingWidth, this.height);
 				this.currentImageKicking++;
@@ -757,7 +849,7 @@ canvas {
 			if(this.isJumping){
 				this.jump();
 			}
-			if(this.isSpecialing){
+			if(this.isSpecialing && !this.isJumping && !this.isCrouching && !this.movingRight && !this.movingLeft && !this.isPunching && !this.isKicking && !playerR.isSpecialing){
 				this.special();
 			}
 		}
@@ -790,12 +882,24 @@ canvas {
 		this.checkMove = function(event){
 			if(event.key == 'a' && this.movingLeft == false){
 				this.movingLeft = true;
+				if(this.isSpecialing){
+					this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+				}
 				//console.log("left start");
 				//document.removeEventListener
 				
 			}
 			if(event.key == 'd' && this.movingRight == false){
 				this.movingRight = true;
+				if(this.isSpecialing){
+					this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+				}
 				//console.log("right start");
 				//console.log(this.x);
 			}
@@ -822,7 +926,6 @@ canvas {
 		}
 		if(event.key == 'z' && this.isSpecialing){
 			this.isSpecialing = false;
-			this.isSpecial = false;
 		}
 		if(event.key == 's' && this.isCrouching){
 			this.isCrouching = false;
@@ -841,7 +944,7 @@ canvas {
 			this.kick();
 			this.isKicking = true;
 		}
-		else if(event.key == 'z' && this.specialCharge >= 100){
+		else if(event.key == 'z' && this.specialCharge >= 100 && !playerR.isSpecialing){
 			this.isSpecialing = true;
 		}
 	}
@@ -851,6 +954,8 @@ canvas {
 				playerR.health -= 5;
 				this.canPunch = false;
 				this.isPunching = false;
+				playerR.specialCharge += 5;
+				playerL.specialCharge += 2.5;
 				
 		}
 	
@@ -862,20 +967,31 @@ canvas {
 				playerR.health -= 10;
 				this.canKick = false;
 				this.isKicking = false;
+				playerR.specialCharge += 10;
+				playerL.specialCharge += 5;
 		}
 	}
 	
 	
 	this.special = function(){
 		
-		if(!this.canSpecial){
+		if(!this.canSpecial && this.specialCharge >= 100){
 			this.isCharging = true;
 			
-			setTimeout(setLSpecialTrue, 3000);
+			myvar = setTimeout(setLSpecialTrue, 3000);
+			
+			if(this.movingRight || this.movingLeft){
+				this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+				clearTimeout(myvar);
+			}
 		}
 		
-		else if(this.canSpecial){
-		
+		else if(this.canSpecial && this.specialCharge >= 100){
+			console.log(this.movingRight);
+			console.log(this.movingLeft);
 			if(!this.isSpecial){
 				this.startX = this.x;
 				console.log(this.startX);
@@ -883,7 +999,7 @@ canvas {
 		
 			this.isSpecial = true;
 		
-			if(this.isSpecial){
+			if(this.isSpecial && this.specialCharge >= 100){
 				this.chefsSpecial();
 			}
 		}
@@ -895,18 +1011,25 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge = 0;
+				this.specialCharge -= 100;
 				playerR.health -= 50;
+				playerR.specialCharge += 20;
 				console.log("Near");
 		   }
-			else if(this.x < this.startX + 500 && this.canSpecial && this.x < playerR.x-this.width){
+		   if(this.movingRight || this.movingLeft){
+				this.isSpecial = false;
+				this.isSpecialing = false;
+				this.canSpecial = false;
+				this.specialCharge -= 100;
+		   }
+			else if(this.x < this.startX + 500 && this.canSpecial && this.x < playerR.x-this.width && this.specialCharge >= 100){
 				this.x += this.speed*3;
 			}
 			else{
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge = 0;
+				this.specialCharge -= 100;
 			}
 			console.log("specialing");
 		}
@@ -1036,9 +1159,10 @@ canvas {
 				this.kick();
 				this.isKicking = true;
 			}
-			else if(event.key == 'b' && this.specialCharge >= 100 && !this.movingRight && !this.movingLeft && !this.isPunching && !this.isKicking){
+			if(event.key == 'b' && this.specialCharge >= 100 && !this.movingRight && !this.movingLeft && !this.isPunching && !this.isKicking){
 				this.special();
 				this.isSpecial = true;
+				console.log('kyle');
 			}
 	}
 	
@@ -1046,6 +1170,10 @@ canvas {
 			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
 		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
 				playerL.health -= 10;
+				playerL.specialCharge = 100;
+				this.specialCharge += 2.5;
+				console.log(this.specialCharge, playerL.specialCharge)
+				
 				this.canPunch = false;
 				this.isPunching = false;
 				console.log("punch");
@@ -1058,6 +1186,12 @@ canvas {
 			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
 		   (playerR.x - playerL.x - playerL.width) <= 100 && this.canKick && this.isPunching == false){
 				playerL.health -= 15;
+				if(playerL.specialCharge < 100){
+					playerL.specialCharge += 10;
+				}
+				if(playerR.specialCharge < 100){
+					playerR.specialCharge += 5;
+				}
 				this.canKick = false;
 				this.isKicking = false;
 		}
@@ -1199,9 +1333,6 @@ canvas {
 			setTimeout(setLKickTrue, 2000);
 			this.kick();
 			this.isKicking = true;
-		}
-		else if(event.key == 'z'){
-			this.special;
 		}
 	}
 	

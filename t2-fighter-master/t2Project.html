@@ -23,7 +23,7 @@ canvas {
 }
 #overlay2{
 	position: absolute;
-	left: px;
+	left: 900px;
 	top: 300px;
 	height: 100px;
 	width: 200px;
@@ -31,6 +31,7 @@ canvas {
 	font-size: 30px;
 	color: white;
 	font-weight: bold;
+	background-color = blue; 
 }
 </style>
 
@@ -40,6 +41,7 @@ canvas {
 		<div id= 'overlay' onclick='rematch()'></div>
 		<div id = 'overlay2' onclick='backToSelect()'></div>
 	</div>
+	
 <script>
 	var canvas = document.getElementById("canvasID");
 	var context = canvas.getContext("2d");
@@ -232,16 +234,16 @@ canvas {
 			if(playerL.win == 2 || playerR.win == 2){
 				stateController = 8;
 				document.getElementById('overlay').style.backgroundColor = 'red';
-		document.getElementById('overlay2').style.backgroundColor = '#FF0000';
-		//console.log('gothere');
-		document.getElementById('overlay').innerHTML = 'REMATCH';
-		document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
-		document.removeEventListener("keydown", gameKeyPressed);
-		document.removeEventListener("keyup", gameKeyReleased);
-		document.getElementById('overlay').onmouseover = function(){document.getElementById('overlay').style.backgroundColor = 'green';};
-		document.getElementById('overlay').onmouseleave = function(){document.getElementById('overlay').style.backgroundColor = 'red';};
-		document.getElementById('overlay2').onmouseover = function(){document.getElementById('overlay2').style.backgroundColor = 'green';};
-		document.getElementById('overlay2').onmouseleave = function(){document.getElementById('overlay2').style.backgroundColor = 'red';};
+				document.getElementById('overlay2').style.backgroundColor = '#FF0000';
+				//console.log('gothere');
+				document.getElementById('overlay').innerHTML = 'REMATCH';
+				document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+				document.removeEventListener("keydown", gameKeyPressed);
+				document.removeEventListener("keyup", gameKeyReleased);
+				document.getElementById('overlay').onmouseover = function(){document.getElementById('overlay').style.backgroundColor = 'green';};
+				document.getElementById('overlay').onmouseleave = function(){document.getElementById('overlay').style.backgroundColor = 'red';};
+				document.getElementById('overlay2').onmouseover = function(){document.getElementById('overlay2').style.backgroundColor = 'green';};
+				document.getElementById('overlay2').onmouseleave = function(){document.getElementById('overlay2').style.backgroundColor = 'red';};
 			}
 			
 			else if(playerL.win == 1 && playerR.win == 1){
@@ -249,16 +251,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				else{
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 				else{
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 			}
 			else if(playerL.win == 1 || playerR.win == 1){
@@ -266,16 +268,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				else{
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 				else{
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 			}
 		}
@@ -332,8 +334,10 @@ canvas {
 	}
 	
 	function rematch(){
-		playerL.health = 30;
-		playerR.health = 30;
+		playerL.health = 100;
+		playerR.health = 100;
+		playerL.specialCharge = 0;
+		playerR.specialCharge = 0;
 		playerL.win = 0;
 		playerR.win = 0;
 		stateController = 3;
@@ -521,7 +525,7 @@ canvas {
 		this.isCrouching = false;
 		this.isSpecial = false;
 		this.isSpecialing = false;
-		this.specialCharge = 100;
+		this.specialCharge = 0;
 		this.canSpecial = false;
 
 		this.maxJumpHeight = 100;
@@ -694,7 +698,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 		}
 		
@@ -719,7 +723,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				playerL.health -= 50;
 				playerL.specialCharge += 20;
 				console.log("Near");
@@ -731,7 +735,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 			console.log("specialing");
 		}
@@ -786,7 +790,15 @@ canvas {
 		this.currentImageJumping = 0;
 		this.numbImagesJumping = 7;
 		
-		this.specialCharge = 100;
+		this.punching = new Image();
+		this.punching.src = "./fighter-stuff/normalSamo_punching_left.png";	
+		this.punchingWidth = 200;
+		this.punchingImageWidth = 600;
+		this.punchingImageHeight = 800;
+		this.currentImagePunching = 0;
+		this.numbImagesPunching = 5;
+		
+		this.specialCharge = 0;
 		this.isSpecial = false;
 		this.isSpecialing = false;
 		this.canSpecial = false;
@@ -833,7 +845,7 @@ canvas {
 				this.currentImageWalking++;
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
-			if(!this.movingRight && !this.movingLeft && !this.isJumping){
+			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching){
 				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
 				
 	}
@@ -886,7 +898,7 @@ canvas {
 					this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				}
 				//console.log("left start");
 				//document.removeEventListener
@@ -898,7 +910,7 @@ canvas {
 					this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				}
 				//console.log("right start");
 				//console.log(this.x);
@@ -984,7 +996,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				clearTimeout(myvar);
 			}
 		}
@@ -1011,7 +1023,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				playerR.health -= 50;
 				playerR.specialCharge += 20;
 				console.log("Near");
@@ -1020,7 +1032,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 		   }
 			else if(this.x < this.startX + 500 && this.canSpecial && this.x < playerR.x-this.width && this.specialCharge >= 100){
 				this.x += this.speed*3;
@@ -1029,7 +1041,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 			console.log("specialing");
 		}
@@ -1067,7 +1079,7 @@ canvas {
 		this.currentImagePos = 0;
 		this.subImageHeight = 100*5/4;
 		this.subImageWidth = 100;
-		this.specialCharge = 100;
+		this.specialCharge = 0;
 		this.canSpecial = true;
 		this.isSpecial = false;
 		
@@ -1170,7 +1182,7 @@ canvas {
 			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
 		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
 				playerL.health -= 10;
-				playerL.specialCharge = 100;
+				playerL.specialCharge += 5;
 				this.specialCharge += 2.5;
 				console.log(this.specialCharge, playerL.specialCharge)
 				

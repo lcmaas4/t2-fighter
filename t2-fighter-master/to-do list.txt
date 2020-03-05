@@ -1,0 +1,16 @@
+Samofighter Checklist
+Jeff
+-normalSamo kicking
+-normalSamo crouching
+-crouching and jumping dodge logic
+-punching and kicking debugging
+-thickSamo sprites
+
+Louis
+-finish charge logic
+-projectile logic
+-special charge meter logic & ui
+	-taking damage charges bar x2 faster than dealing
+-health bars
+-game state aesthetics
+-fix ending divs

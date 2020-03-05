@@ -23,7 +23,7 @@ canvas {
 }
 #overlay2{
 	position: absolute;
-	left: px;
+	left: 900px;
 	top: 300px;
 	height: 100px;
 	width: 200px;
@@ -31,6 +31,7 @@ canvas {
 	font-size: 30px;
 	color: white;
 	font-weight: bold;
+	background-color = blue; 
 }
 </style>
 
@@ -40,6 +41,7 @@ canvas {
 		<div id= 'overlay' onclick='rematch()'></div>
 		<div id = 'overlay2' onclick='backToSelect()'></div>
 	</div>
+	
 <script>
 	var canvas = document.getElementById("canvasID");
 	var context = canvas.getContext("2d");
@@ -232,16 +234,16 @@ canvas {
 			if(playerL.win == 2 || playerR.win == 2){
 				stateController = 8;
 				document.getElementById('overlay').style.backgroundColor = 'red';
-		document.getElementById('overlay2').style.backgroundColor = '#FF0000';
-		//console.log('gothere');
-		document.getElementById('overlay').innerHTML = 'REMATCH';
-		document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
-		document.removeEventListener("keydown", gameKeyPressed);
-		document.removeEventListener("keyup", gameKeyReleased);
-		document.getElementById('overlay').onmouseover = function(){document.getElementById('overlay').style.backgroundColor = 'green';};
-		document.getElementById('overlay').onmouseleave = function(){document.getElementById('overlay').style.backgroundColor = 'red';};
-		document.getElementById('overlay2').onmouseover = function(){document.getElementById('overlay2').style.backgroundColor = 'green';};
-		document.getElementById('overlay2').onmouseleave = function(){document.getElementById('overlay2').style.backgroundColor = 'red';};
+				document.getElementById('overlay2').style.backgroundColor = '#FF0000';
+				//console.log('gothere');
+				document.getElementById('overlay').innerHTML = 'REMATCH';
+				document.getElementById('overlay2').innerHTML = 'CHARACTER SELECT';
+				document.removeEventListener("keydown", gameKeyPressed);
+				document.removeEventListener("keyup", gameKeyReleased);
+				document.getElementById('overlay').onmouseover = function(){document.getElementById('overlay').style.backgroundColor = 'green';};
+				document.getElementById('overlay').onmouseleave = function(){document.getElementById('overlay').style.backgroundColor = 'red';};
+				document.getElementById('overlay2').onmouseover = function(){document.getElementById('overlay2').style.backgroundColor = 'green';};
+				document.getElementById('overlay2').onmouseleave = function(){document.getElementById('overlay2').style.backgroundColor = 'red';};
 			}
 			
 			else if(playerL.win == 1 && playerR.win == 1){
@@ -249,16 +251,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				else{
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 				else{
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 			}
 			else if(playerL.win == 1 || playerR.win == 1){
@@ -266,16 +268,16 @@ canvas {
 				playerL.x = 100;
 				playerR.x = 1200-playerR.width-100;
 				if(playerL.name == thickSamokai){
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				else{
-					playerL.health = 30;
+					playerL.health = 100;
 				}
 				if(playerR.name == thickSamokai){
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 				else{
-					playerR.health = 30;
+					playerR.health = 100;
 				}
 			}
 		}
@@ -332,8 +334,10 @@ canvas {
 	}
 	
 	function rematch(){
-		playerL.health = 30;
-		playerR.health = 30;
+		playerL.health = 100;
+		playerR.health = 100;
+		playerL.specialCharge = 0;
+		playerR.specialCharge = 0;
 		playerL.win = 0;
 		playerR.win = 0;
 		stateController = 3;
@@ -509,7 +513,6 @@ canvas {
 		this.y = 200;
 		this.width = 120;
 		this.height = 250;
-    
 		this.movingRight = false;
 		this.movingLeft = false;
 		this.isJumping = false;
@@ -520,7 +523,11 @@ canvas {
 		this.isPunching = false;
 		this.isKicking = false;
 		this.isCrouching = false;
-		
+		this.isSpecial = false;
+		this.isSpecialing = false;
+		this.specialCharge = 0;
+		this.canSpecial = false;
+
 		this.maxJumpHeight = 100;
 		this.speed = 14;
 		this.health = 100;
@@ -544,67 +551,27 @@ canvas {
 		this.jumpingImageWidth = 500;
 		this.jumpingImageHeight = 800;
 		this.currentImageJumping = 0;
-		this.numbImagesJumping = 7;
-		
-		this.punching = new Image();
-		this.punching.src = "./fighter-stuff/normalSamo_punching_right.png";	
-		this.punchingWidth = 200;
-		this.punchingImageWidth = 600;
-		this.punchingImageHeight = 800;
-		this.currentImagePunching = 0;
-		this.numbImagesPunching = 5;
-		
-		this.specialCharge = 110;
-		this.isSpecial = false;
-		this.isSpecialing = false;
-		this.canSpecial = false;
-		
-		this.kicking = new Image();
-		this.kicking.src = "./fighter-stuff/normalSamo_kicking_right.png";	
-		this.kickingWidth = 200;
-		this.kickingImageWidth = 650;
-		this.kickingImageHeight = 800;
-		this.currentImageKicking = 0;
-		this.numbImagesKicking = 4;
+		this.numbImagesJumping = 5;
 		
 		this.draw = function(){
-			if(this.canPunch && this.isPunching && !this.isJumping && !this.isKicking) {
-				var ssXPunch = this.currentImagePunching * this.punchingImageWidth;
-				context.drawImage(this.punching, ssXPunch, 0, this.punchingImageWidth, this.punchingImageHeight, this.x-75, this.y, this.punchingWidth, this.height);
-				this.currentImagePunching++;
-				this.currentImagePunching %= this.numbImagesPunching;
-				console.log("yeet2");
-				
-				this.movingRight == false;
-				this.movingLeft == false;
-			}
-			if(this.canKick && this.isKicking && !this.isJumping && !this.isPunching) {
-				var ssXKick = this.currentImageKicking * this.kickingImageWidth;
-				context.drawImage(this.kicking, ssXKick, 0, this.kickingImageWidth, this.kickingImageHeight, this.x-75, this.y, this.kickingWidth, this.height);
-				this.currentImageKicking++;
-				this.currentImage %= this.numbImagesKicking;
-				console.log("yeet2");
-				
-				this.movingRight == false;
-				this.movingLeft == false;
-			}
-			if(this.isJumping && !this.isPunching && !this.isKicking) {
-				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
-				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x, this.y, this.jumpingWidth, this.height);
+			if(this.isJumping) {
+				var ssXJump = this.currentImageJumping * (this.jumpingImageWidth);
+				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x-20, this.y, this.jumpingWidth, this.height);
 				this.currentImageJumping++;
 				this.currentImageJumping %= this.numbImagesJumping;
 				console.log("yeet");
 			}
-			if((this.movingRight || this.movingLeft) && (!this.isJumping && !this.isPunching && !this.isKicking)) {
+			if((this.movingRight || this.movingLeft) && !this.isJumping) {
 				var ssXWalk = this.currentImageWalking * this.walkingImageWidth;
 				context.drawImage(this.walking, ssXWalk, 0, this.walkingImageWidth, this.walkingImageHeight, this.x, this.y, this.walkingWidth, this.height);
 				this.currentImageWalking++;
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
-			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching && !this.isKicking){
+			if(!this.movingRight && !this.movingLeft && !this.isJumping){
 				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
-			}	
-	}
+				
+			}
+		}
 		
 		this.move = function(){
 			if(this.movingRight == true){
@@ -731,7 +698,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 		}
 		
@@ -756,7 +723,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				playerL.health -= 50;
 				playerL.specialCharge += 20;
 				console.log("Near");
@@ -768,7 +735,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 			console.log("specialing");
 		}
@@ -831,21 +798,21 @@ canvas {
 		this.currentImagePunching = 0;
 		this.numbImagesPunching = 5;
 		
-		this.specialCharge = 110;
+		this.specialCharge = 0;
 		this.isSpecial = false;
 		this.isSpecialing = false;
 		this.canSpecial = false;
 		
-		this.kicking = new Image();
+/*		this.kicking = new Image();
 		this.kicking.src = "./fighter-stuff/normalSamo_kicking_left.png";	
 		this.kickingWidth = 200;
 		this.kickingImageWidth = 650;
 		this.kickingImageHeight = 800;
 		this.currentImageKicking = 0;
 		this.numbImagesKicking = 4;
-		
+		*/
 		this.draw = function(){
-			if(this.canPunch && this.isPunching && !this.isJumping && !this.isKicking) {
+			/*if(this.canPunch && this.isPunching && !this.isJumping) {
 				var ssXPunch = this.currentImagePunching * this.punchingImageWidth;
 				context.drawImage(this.punching, ssXPunch, 0, this.punchingImageWidth, this.punchingImageHeight, this.x, this.y, this.punchingWidth, this.height);
 				this.currentImagePunching++;
@@ -864,21 +831,21 @@ canvas {
 				
 				this.movingRight == false;
 				this.movingLeft == false;
-			}
-			if(this.isJumping && !this.isPunching && !this.isKicking) {
+			}*/
+			if(this.isJumping && !this.isPunching) {
 				var ssXJump = this.currentImageJumping * this.jumpingImageWidth;
 				context.drawImage(this.jumping, ssXJump, 0, this.jumpingImageWidth, this.jumpingImageHeight, this.x, this.y, this.jumpingWidth, this.height);
 				this.currentImageJumping++;
 				this.currentImageJumping %= this.numbImagesJumping;
 				console.log("yeet");
 			}
-			if((this.movingRight || this.movingLeft) && (!this.isJumping && !this.isPunching && !this.isKicking)) {
+			if((this.movingRight || this.movingLeft) && (!this.isJumping && !this.isPunching)) {
 				var ssXWalk = this.currentImageWalking * this.walkingImageWidth;
 				context.drawImage(this.walking, ssXWalk, 0, this.walkingImageWidth, this.walkingImageHeight, this.x, this.y, this.walkingWidth, this.height);
 				this.currentImageWalking++;
 				this.currentImageWalking %= this.numbImagesWalking;
 			}
-			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching && !this.isKicking){
+			if(!this.movingRight && !this.movingLeft && !this.isJumping && !this.isPunching){
 				context.drawImage(this.standing, this.x, this.y, this.width, this.height);
 				
 	}
@@ -931,7 +898,7 @@ canvas {
 					this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				}
 				//console.log("left start");
 				//document.removeEventListener
@@ -943,7 +910,7 @@ canvas {
 					this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				}
 				//console.log("right start");
 				//console.log(this.x);
@@ -1029,7 +996,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				clearTimeout(myvar);
 			}
 		}
@@ -1056,7 +1023,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 				playerR.health -= 50;
 				playerR.specialCharge += 20;
 				console.log("Near");
@@ -1065,7 +1032,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 		   }
 			else if(this.x < this.startX + 500 && this.canSpecial && this.x < playerR.x-this.width && this.specialCharge >= 100){
 				this.x += this.speed*3;
@@ -1074,7 +1041,7 @@ canvas {
 				this.isSpecial = false;
 				this.isSpecialing = false;
 				this.canSpecial = false;
-				this.specialCharge -= 100;
+				this.specialCharge = 0;
 			}
 			console.log("specialing");
 		}
@@ -1112,7 +1079,7 @@ canvas {
 		this.currentImagePos = 0;
 		this.subImageHeight = 100*5/4;
 		this.subImageWidth = 100;
-		this.specialCharge = 100;
+		this.specialCharge = 0;
 		this.canSpecial = true;
 		this.isSpecial = false;
 		
@@ -1215,7 +1182,7 @@ canvas {
 			if(Math.abs((playerL.y + playerL.subImageHeight/2) - (playerR.y + playerR.subImageHeight/2)) <= (playerR.subImageHeight + playerL.subImageHeight)/2 &&
 		   (playerR.x - playerL.x - playerL.width) <= 50 && this.canPunch && this.isKicking == false){
 				playerL.health -= 10;
-				playerL.specialCharge = 100;
+				playerL.specialCharge += 5;
 				this.specialCharge += 2.5;
 				console.log(this.specialCharge, playerL.specialCharge)
 				
